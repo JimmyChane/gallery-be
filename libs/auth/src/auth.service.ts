@@ -1,6 +1,6 @@
 import { RedisService } from '@app/redis/redis.service';
 import { UserService } from '@app/user/user.service';
-import { parseUnknownEnum } from '@chanzor/utils';
+import { getString, parseUnknownEnum } from '@chanzor/utils';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthExchangeReqDto } from './dto/auth-exchange.req.dto';
@@ -15,7 +15,7 @@ export type JwtAccessPayload = { userId: string; username: string };
 
 @Injectable()
 export class AuthService {
-  private readonly SESSION_TTL = 300;
+  private readonly SESSION_TTL = 300; // 5 minutes
 
   constructor(
     private readonly jwtService: JwtService,
@@ -34,7 +34,7 @@ export class AuthService {
 
   async getUserState(userId: string): Promise<AuthUserStateEnum | undefined> {
     const client = await this.redisService.getClient();
-    const value = client.get(this.getSessionKey(userId));
+    const value = await client.get(this.getSessionKey(userId));
     return parseUnknownEnum(value, Object.values(AuthUserStateEnum));
   }
 
@@ -52,17 +52,16 @@ export class AuthService {
 
   async exchangeLoginToken(payload: AuthExchangeReqDto): Promise<AuthAccessResDto> {
     try {
-      const payloadJwt: Partial<JwtLoginPayload> = this.jwtService.verify(payload.loginToken);
+      const payloadJwt = await this.jwtService.verifyAsync<JwtLoginPayload>(payload.loginToken);
+      const userIdJwt = getString(payloadJwt.userId);
+      const usernameJwt = getString(payloadJwt.username);
 
-      if (payloadJwt.type !== 'login') throw new UnauthorizedException('Invalid token type');
-      if (typeof payloadJwt.userId !== 'string' || !payloadJwt.userId.length) throw new UnauthorizedException('Invalid user id');
-      if (typeof payloadJwt.username !== 'string' || !payloadJwt.username.length) throw new UnauthorizedException('Invalid username');
+      if (payloadJwt?.type !== 'login') throw new UnauthorizedException('Invalid token type');
+      if (!userIdJwt?.length || !usernameJwt?.length) throw new UnauthorizedException('Invalid payload');
 
-      const userId = payloadJwt.userId;
+      await this.setUserState(userIdJwt, AuthUserStateEnum.ACTIVE);
 
-      await this.setUserState(userId, AuthUserStateEnum.ACTIVE);
-
-      return this.generateTokenPair(userId, payloadJwt.username);
+      return this.generateTokenPair(userIdJwt, userIdJwt);
     } catch (e) {
       throw new UnauthorizedException('Login token expired or invalid');
     }
@@ -74,10 +73,10 @@ export class AuthService {
       if (payloadJwt.type !== 'refresh') throw new UnauthorizedException('Invalid token type');
 
       const userId = payloadJwt.userId;
-      const client = await this.redisService.getClient();
 
-      const session = await client.get(this.getSessionKey(userId));
-      if (!session || session === 'inactive') throw new UnauthorizedException('Session expired due to inactivity');
+      const currentState = await this.getUserState(userId);
+
+      if (currentState === AuthUserStateEnum.LOGOUT) throw new UnauthorizedException('Session expired or logged out');
 
       await this.setUserState(userId, AuthUserStateEnum.ACTIVE);
 

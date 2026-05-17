@@ -1,4 +1,4 @@
-import { MaybeUndefined } from '@chanzor/utils';
+import { getString, MaybeUndefined } from '@chanzor/utils';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
@@ -14,33 +14,28 @@ export class AuthAccessTokenGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractTokenFromHeader(request);
+    const accessToken = this.extractTokenFromHeader(request);
 
-    if (!token?.length) throw new UnauthorizedException('Access token missing');
+    if (!accessToken?.length) throw new UnauthorizedException('Access token missing');
 
     try {
-      const payload: MaybeUndefined<Partial<JwtAccessPayload>> = await this.jwtService.verifyAsync(token);
+      const payloadJwt: MaybeUndefined<Partial<JwtAccessPayload>> = await this.jwtService.verifyAsync(accessToken);
+      const userIdJwt = getString(payloadJwt.userId);
 
-      const userId = payload?.userId;
-      if (!userId || typeof userId !== 'string' || !userId.length) {
-        throw new UnauthorizedException('Invalid user id');
-      }
+      if (!userIdJwt?.length) throw new UnauthorizedException('Invalid token payload');
 
-      const state = await this.authService.getUserState(userId);
+      const state = await this.authService.getUserState(userIdJwt);
       if (state !== AuthUserStateEnum.ACTIVE) {
         throw new UnauthorizedException('Session expired or user logged out');
       }
 
-      request['user'] = payload;
+      request['user'] = payloadJwt;
+      return true;
     } catch (e) {
-      if (e instanceof Error) {
-        throw new UnauthorizedException(e.message);
-      } else {
-        throw new UnauthorizedException('Invalid access token');
-      }
+      if (e instanceof UnauthorizedException) throw e;
+      if (e instanceof Error) throw new UnauthorizedException(e.message);
+      throw new UnauthorizedException('Invalid access token');
     }
-
-    return true;
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
