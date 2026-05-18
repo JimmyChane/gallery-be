@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1
+
 ##############################
 # INSTALL DEPENDENCIES
 ##############################
@@ -6,7 +8,8 @@ FROM node:22-alpine AS deps
 WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm install
+# CHANGE: Use npm ci (faster) and a cache mount (saves packages between builds)
+RUN --mount=type=cache,target=/root/.npm npm ci
 
 ##############################
 # DEV
@@ -31,7 +34,8 @@ COPY --from=deps /usr/src/app/node_modules ./node_modules
 COPY . .
 
 RUN npm run build
-RUN npm prune --production
+# CHANGE: Use the cache mount here too to speed up the pruning
+RUN --mount=type=cache,target=/root/.npm npm prune --production
 
 ##############################
 # PRODUCTION

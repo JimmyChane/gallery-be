@@ -9,6 +9,14 @@ services:
     depends_on:
       main:
         condition: service_healthy
+    # A more robust script using 'ping'
+    command: >
+      sh -c "until getent hosts main > /dev/null 2>&1; do 
+        echo 'Waiting for main service...'; 
+        sleep 2; 
+      done; 
+      echo 'SUCCESS: main service found at $(getent hosts main | awk \"{print \$1}\"). Starting Nginx now...';
+      nginx -g 'daemon off;'"
     healthcheck:
       test: ['CMD-SHELL', "curl -sI http://localhost | grep -q 'HTTP/1.1' || exit 1"]
       start_period: 30s
