@@ -1,6 +1,6 @@
 import { RedisService } from '@app/redis/redis.service';
 import { UserService } from '@app/user/user.service';
-import { getString, parseUnknownEnum } from '@chanzor/utils';
+import { getString, MaybeUndefined, parseUnknownEnum } from '@chanzor/utils';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthExchangeReqDto } from './dto/auth-exchange.req.dto';
@@ -98,5 +98,10 @@ export class AuthService {
 
   async logout(userId: string): Promise<void> {
     await this.setUserState(userId, AuthUserStateEnum.LOGOUT);
+  }
+
+  async verifyAccessToken(accessToken: string): Promise<Partial<JwtAccessPayload>> {
+    const payloadJwt: MaybeUndefined<Partial<JwtAccessPayload>> = await this.jwtService.verifyAsync(accessToken);
+    return payloadJwt;
   }
 }

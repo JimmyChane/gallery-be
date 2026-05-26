@@ -1,8 +1,8 @@
+import { AuthAccessTokenGuard } from '@app/auth/guard/auth-access-token.guard';
 import { Controller, UseGuards } from '@nestjs/common';
-import { AccessTokenGuard } from './access-token/access-token.guard';
 
 @Controller()
-@UseGuards(AccessTokenGuard)
+@UseGuards(AuthAccessTokenGuard)
 export class AppController {
   constructor() {}
 }

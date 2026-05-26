@@ -1,16 +1,12 @@
 import { getString, MaybeUndefined } from '@chanzor/utils';
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { AuthService, JwtAccessPayload } from '../auth.service';
 import { AuthUserStateEnum } from '../enum/auth-user-state.enum';
 
 @Injectable()
 export class AuthAccessTokenGuard implements CanActivate {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private readonly authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
@@ -19,7 +15,7 @@ export class AuthAccessTokenGuard implements CanActivate {
     if (!accessToken?.length) throw new UnauthorizedException('Access token missing');
 
     try {
-      const payloadJwt: MaybeUndefined<Partial<JwtAccessPayload>> = await this.jwtService.verifyAsync(accessToken);
+      const payloadJwt: MaybeUndefined<Partial<JwtAccessPayload>> = await this.authService.verifyAccessToken(accessToken);
       const userIdJwt = getString(payloadJwt.userId);
 
       if (!userIdJwt?.length) throw new UnauthorizedException('Invalid token payload');

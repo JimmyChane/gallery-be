@@ -1,7 +1,7 @@
-import { AccessTokenGuard } from '@/access-token/access-token.guard';
 import { CacheControl } from '@/cache-control/cache-control.decorator';
 import { Expires } from '@/expires/expires.decorator';
 import { benchmark } from '@/util/benchmark';
+import { AuthAccessTokenGuard } from '@app/auth/guard/auth-access-token.guard';
 import { BadRequestException, Controller, Get, Logger, Param, Query, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { ImageResDto } from './dto/image-list.res.dto';
@@ -9,7 +9,7 @@ import { ColorPaletteResDto } from './dto/image-palette.res.dto';
 import { ImageService } from './image.service';
 
 @Controller()
-@UseGuards(AccessTokenGuard)
+@UseGuards(AuthAccessTokenGuard)
 export class ImageController {
   private readonly logger = new Logger(ImageController.name);
 

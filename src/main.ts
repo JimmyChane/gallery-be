@@ -13,7 +13,7 @@ async function bootstrap(): Promise<void> {
   const appConfigService = app.get(AppConfigService);
 
   app.enableShutdownHooks();
-  app.enableCors(appConfigService.buildCorsOption());
+  app.enableCors({ ...appConfigService.buildCorsOption(), allowedHeaders: 'Content-Type,Authorization', credentials: true });
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
