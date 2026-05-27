@@ -53,6 +53,10 @@ export class UserService implements OnModuleInit {
     return this.createOne({ username: DEFAULT_USERNAME, password: DEFAULT_PASSWORD });
   }
 
+  async findOneById(id: string): Promise<UserDocument | null> {
+    return this.userModel.findOne({ _id: id });
+  }
+
   async findOneByUsername(username: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ username }).exec();
   }
