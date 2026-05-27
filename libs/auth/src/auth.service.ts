@@ -15,7 +15,8 @@ export type JwtAccessPayload = { userId: string; username: string };
 
 @Injectable()
 export class AuthService {
-  private readonly SESSION_TTL = 300; // 5 minutes
+  private readonly ACCESS_SESSION_TTL = 300; // 5 minutes
+  private readonly REFRESH_SESSION_TTL = 330; // 5.5 minutes
 
   constructor(
     private readonly jwtService: JwtService,
@@ -29,7 +30,7 @@ export class AuthService {
 
   private async setUserState(userId: string, state: AuthUserStateEnum): Promise<void> {
     const client = await this.redisService.getClient();
-    await client.set(this.getSessionKey(userId), state, 'EX', this.SESSION_TTL);
+    await client.set(this.getSessionKey(userId), state, 'EX', this.ACCESS_SESSION_TTL);
   }
 
   async getUserState(userId: string): Promise<AuthUserStateEnum | undefined> {
@@ -91,8 +92,8 @@ export class AuthService {
     const jwtRefreshPayload: JwtRefreshPayload = { type: 'refresh', userId, username };
 
     return {
-      accessToken: this.jwtService.sign(jwtAccessPayload, { expiresIn: `${this.SESSION_TTL}s` }),
-      refreshToken: this.jwtService.sign(jwtRefreshPayload, { expiresIn: `${this.SESSION_TTL}s` }),
+      accessToken: this.jwtService.sign(jwtAccessPayload, { expiresIn: `${this.ACCESS_SESSION_TTL}s` }),
+      refreshToken: this.jwtService.sign(jwtRefreshPayload, { expiresIn: `${this.REFRESH_SESSION_TTL}s` }),
     };
   }
 
