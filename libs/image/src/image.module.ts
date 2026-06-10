@@ -7,13 +7,11 @@ import { ImageDimensionService } from './image-dimension.service';
 import { ImageFormatService } from './image-format.service';
 import { ImageListService } from './image-list.service';
 import { ImageStreamService } from './image-stream.service';
-import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
 
 @Module({
   imports: [AuthModule, AppEnvModule, RedlockModule, LocalFileModule],
   providers: [ImageDimensionService, ImageFormatService, ImageListService, ImageService, ImageStreamService],
-  controllers: [ImageController],
-  exports: [ImageListService, ImageStreamService],
+  exports: [ImageListService, ImageService, ImageStreamService],
 })
 export class ImageModule {}

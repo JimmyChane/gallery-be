@@ -2,84 +2,121 @@
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
-  "compilerOptions": { "deleteOutDir": false, "webpack": true, "plugins": ["@nestjs/swagger"] },
+  "compilerOptions": {
+    "deleteOutDir": false,
+    "webpack": true,
+    "plugins": [
+      "@nestjs/swagger"
+    ]
+  },
   "projects": {
+    "api": {
+      "type": "library",
+      "root": "libs/api",
+      "entryFile": "index",
+      "sourceRoot": "libs/api/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/api/tsconfig.lib.json"
+      }
+    },
     "app-config": {
       "type": "library",
       "root": "libs/app-config",
       "entryFile": "index",
       "sourceRoot": "libs/app-config/src",
-      "compilerOptions": { "tsConfigPath": "libs/app-config/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/app-config/tsconfig.lib.json"
+      }
     },
     "app-env": {
       "type": "library",
       "root": "libs/app-env",
       "entryFile": "index",
       "sourceRoot": "libs/app-env/src",
-      "compilerOptions": { "tsConfigPath": "libs/app-env/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/app-env/tsconfig.lib.json"
+      }
     },
     "auth": {
       "type": "library",
       "root": "libs/auth",
       "entryFile": "index",
       "sourceRoot": "libs/auth/src",
-      "compilerOptions": { "tsConfigPath": "libs/auth/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/auth/tsconfig.lib.json"
+      }
     },
     "cat": {
       "type": "library",
       "root": "libs/cat",
       "entryFile": "index",
       "sourceRoot": "libs/cat/src",
-      "compilerOptions": { "tsConfigPath": "libs/cat/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/cat/tsconfig.lib.json"
+      }
     },
     "database-mongodb": {
       "type": "library",
       "root": "libs/database-mongodb",
       "entryFile": "index",
       "sourceRoot": "libs/database-mongodb/src",
-      "compilerOptions": { "tsConfigPath": "libs/database-mongodb/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/database-mongodb/tsconfig.lib.json"
+      }
     },
     "health": {
       "type": "library",
       "root": "libs/health",
       "entryFile": "index",
       "sourceRoot": "libs/health/src",
-      "compilerOptions": { "tsConfigPath": "libs/health/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/health/tsconfig.lib.json"
+      }
     },
     "image": {
       "type": "library",
       "root": "libs/image",
       "entryFile": "index",
       "sourceRoot": "libs/image/src",
-      "compilerOptions": { "tsConfigPath": "libs/image/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/image/tsconfig.lib.json"
+      }
     },
     "local-file": {
       "type": "library",
       "root": "libs/local-file",
       "entryFile": "index",
       "sourceRoot": "libs/local-file/src",
-      "compilerOptions": { "tsConfigPath": "libs/local-file/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/local-file/tsconfig.lib.json"
+      }
     },
     "redis": {
       "type": "library",
       "root": "libs/redis",
       "entryFile": "index",
       "sourceRoot": "libs/redis/src",
-      "compilerOptions": { "tsConfigPath": "libs/redis/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/redis/tsconfig.lib.json"
+      }
     },
     "redlock": {
       "type": "library",
       "root": "libs/redlock",
       "entryFile": "index",
       "sourceRoot": "libs/redlock/src",
-      "compilerOptions": { "tsConfigPath": "libs/redlock/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/redlock/tsconfig.lib.json"
+      }
     },
     "user": {
       "type": "library",
       "root": "libs/user",
       "entryFile": "index",
       "sourceRoot": "libs/user/src",
-      "compilerOptions": { "tsConfigPath": "libs/user/tsconfig.lib.json" }
+      "compilerOptions": {
+        "tsConfigPath": "libs/user/tsconfig.lib.json"
+      }
     }
   }
 }

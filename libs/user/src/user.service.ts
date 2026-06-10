@@ -4,6 +4,7 @@ import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
+import { UserItemResDto } from './dto/user-item.res.dto';
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from './user.meta';
 import { UserDocument } from './user.schema';
 
@@ -89,5 +90,17 @@ export class UserService implements OnModuleInit {
 
   async comparePassword(password: string, passwordHashed: string): Promise<boolean> {
     return await bcrypt.compare(password, passwordHashed);
+  }
+
+  async getList(page: number = 0, limit: number = 10): Promise<UserItemResDto[]> {
+    const list = await this.userModel
+      .find()
+      .skip(page * limit)
+      .limit(limit)
+      .exec();
+
+    return list.map((item) => {
+      return { id: item._id.toString(), username: item.username };
+    });
   }
 }

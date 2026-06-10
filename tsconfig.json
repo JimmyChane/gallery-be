@@ -30,29 +30,81 @@
     "useUnknownInCatchVariables": true,
     "strictBuiltinIteratorReturn": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@app/app-config": ["libs/app-config/src"],
-      "@app/app-config/*": ["libs/app-config/src/*"],
-      "@app/app-env": ["libs/app-env/src"],
-      "@app/app-env/*": ["libs/app-env/src/*"],
-      "@app/auth": ["libs/auth/src"],
-      "@app/auth/*": ["libs/auth/src/*"],
-      "@app/cat": ["libs/cat/src"],
-      "@app/cat/*": ["libs/cat/src/*"],
-      "@app/database-mongodb": ["libs/database-mongodb/src"],
-      "@app/database-mongodb/*": ["libs/database-mongodb/src/*"],
-      "@app/health": ["libs/health/src"],
-      "@app/health/*": ["libs/health/src/*"],
-      "@app/image": ["libs/image/src"],
-      "@app/image/*": ["libs/image/src/*"],
-      "@app/local-file": ["libs/local-file/src"],
-      "@app/local-file/*": ["libs/local-file/src/*"],
-      "@app/redis": ["libs/redis/src"],
-      "@app/redis/*": ["libs/redis/src/*"],
-      "@app/redlock": ["libs/redlock/src"],
-      "@app/redlock/*": ["libs/redlock/src/*"],
-      "@app/user": ["libs/user/src"],
-      "@app/user/*": ["libs/user/src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@app/api": [
+        "libs/api/src"
+      ],
+      "@app/api/*": [
+        "libs/api/src/*"
+      ],
+      "@app/app-config": [
+        "libs/app-config/src"
+      ],
+      "@app/app-config/*": [
+        "libs/app-config/src/*"
+      ],
+      "@app/app-env": [
+        "libs/app-env/src"
+      ],
+      "@app/app-env/*": [
+        "libs/app-env/src/*"
+      ],
+      "@app/auth": [
+        "libs/auth/src"
+      ],
+      "@app/auth/*": [
+        "libs/auth/src/*"
+      ],
+      "@app/cat": [
+        "libs/cat/src"
+      ],
+      "@app/cat/*": [
+        "libs/cat/src/*"
+      ],
+      "@app/database-mongodb": [
+        "libs/database-mongodb/src"
+      ],
+      "@app/database-mongodb/*": [
+        "libs/database-mongodb/src/*"
+      ],
+      "@app/health": [
+        "libs/health/src"
+      ],
+      "@app/health/*": [
+        "libs/health/src/*"
+      ],
+      "@app/image": [
+        "libs/image/src"
+      ],
+      "@app/image/*": [
+        "libs/image/src/*"
+      ],
+      "@app/local-file": [
+        "libs/local-file/src"
+      ],
+      "@app/local-file/*": [
+        "libs/local-file/src/*"
+      ],
+      "@app/redis": [
+        "libs/redis/src"
+      ],
+      "@app/redis/*": [
+        "libs/redis/src/*"
+      ],
+      "@app/redlock": [
+        "libs/redlock/src"
+      ],
+      "@app/redlock/*": [
+        "libs/redlock/src/*"
+      ],
+      "@app/user": [
+        "libs/user/src"
+      ],
+      "@app/user/*": [
+        "libs/user/src/*"
+      ]
     }
   }
 }

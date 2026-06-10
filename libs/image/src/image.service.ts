@@ -6,7 +6,7 @@ import { LocalFileService } from '@app/local-file/local-file.service';
 import { RedlockService } from '@app/redlock/redlock.service';
 import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { Vibrant } from 'node-vibrant/node';
-import { ImageResDto } from './dto/image-list.res.dto';
+import { ImageItemResDto } from './dto/image-item.res.dto';
 
 @Injectable()
 export class ImageService {
@@ -20,7 +20,7 @@ export class ImageService {
   ) {}
 
   // TODO: GET as pagable
-  async getList(): Promise<ImageResDto[]> {
+  async getList(): Promise<ImageItemResDto[]> {
     const filenames = await this.imagelistService.getList();
     return filenames.map((filename) => {
       return { filename: encodeURIComponent(filename).toString() };
