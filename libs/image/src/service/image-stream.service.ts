@@ -2,8 +2,8 @@ import { benchmark } from '@/util/benchmark';
 import { LocalFileService } from '@app/local-file/local-file.service';
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import sharp from 'sharp';
-import { FilenameModel } from './filename.model';
-import { ImageDimensionModel } from './image-dimension.model';
+import { FilenameModel } from '../model/filename.model';
+import { ImageDimensionModel } from '../model/image-dimension.model';
 import { ImageDimensionService } from './image-dimension.service';
 import { ImageFormatService } from './image-format.service';
 

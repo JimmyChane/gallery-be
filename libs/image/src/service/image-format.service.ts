@@ -1,7 +1,7 @@
 import { LocalFileService } from '@app/local-file/local-file.service';
 import { Injectable } from '@nestjs/common';
-import { FilenameModel } from './filename.model';
-import { ImageFormatId, ImageFormatModel } from './image-format.model';
+import { FilenameModel } from '../model/filename.model';
+import { ImageFormatId, ImageFormatModel } from '../model/image-format.model';
 
 @Injectable()
 export class ImageFormatService {

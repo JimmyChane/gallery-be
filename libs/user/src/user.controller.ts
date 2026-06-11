@@ -1,9 +1,9 @@
 import { AuthAccessTokenGuard } from '@app/auth/guard/auth-access-token.guard';
-import { UserItemResDto } from '@app/user/dto/user-item.res.dto';
 import { UserService } from '@app/user/user.service';
 import { Controller, Get, UseGuards } from '@nestjs/common';
+import { UserItemResDto } from './dto/user-item.res.dto';
 
-@Controller('user')
+@Controller()
 @UseGuards(AuthAccessTokenGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}

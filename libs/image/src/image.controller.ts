@@ -2,13 +2,13 @@ import { CacheControl } from '@/cache-control/cache-control.decorator';
 import { Expires } from '@/expires/expires.decorator';
 import { benchmark } from '@/util/benchmark';
 import { AuthAccessTokenGuard } from '@app/auth/guard/auth-access-token.guard';
-import { ImageItemResDto } from '@app/image/dto/image-item.res.dto';
-import { ColorPaletteResDto } from '@app/image/dto/image-palette.res.dto';
 import { ImageService } from '@app/image/image.service';
 import { BadRequestException, Controller, Get, Logger, Param, Query, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
+import { ImageColorPaletteResDto } from './dto/image-color-palette.res.dto';
+import { ImageItemResDto } from './dto/image-item.res.dto';
 
-@Controller('img')
+@Controller()
 @UseGuards(AuthAccessTokenGuard)
 export class ImageController {
   private readonly logger = new Logger(ImageController.name);
@@ -53,7 +53,7 @@ export class ImageController {
   }
 
   @Get('/one/:filename/palette')
-  async getPallette(@Param('filename') filename: string): Promise<ColorPaletteResDto> {
+  async getPallette(@Param('filename') filename: string): Promise<ImageColorPaletteResDto> {
     return benchmark(this.logger, 'getPallette', () => {
       return this.imageService.getOnePallette(filename);
     });

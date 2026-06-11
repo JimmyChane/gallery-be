@@ -99,7 +99,6 @@
       "<rootDir>/libs/"
     ],
     "moduleNameMapper": {
-      "^@app/api(|/.*)$": "<rootDir>/libs/api/src/$1",
       "^@app/app-config(|/.*)$": "<rootDir>/libs/app-config/src/$1",
       "^@app/app-env(|/.*)$": "<rootDir>/libs/app-env/src/$1",
       "^@app/auth(|/.*)$": "<rootDir>/libs/auth/src/$1",

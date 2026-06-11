@@ -33,12 +33,6 @@
       "@/*": [
         "./src/*"
       ],
-      "@app/api": [
-        "libs/api/src"
-      ],
-      "@app/api/*": [
-        "libs/api/src/*"
-      ],
       "@app/app-config": [
         "libs/app-config/src"
       ],

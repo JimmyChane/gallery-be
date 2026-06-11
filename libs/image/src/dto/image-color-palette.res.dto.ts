@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, Matches } from 'class-validator';
 
-export class ColorPaletteResDto {
+export class ImageColorPaletteResDto {
   @ApiPropertyOptional({ example: '#3a12ff', description: 'High saturation, balanced luminance' })
   @IsOptional()
   @IsString()

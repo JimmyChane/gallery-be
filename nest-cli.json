@@ -10,15 +10,6 @@
     ]
   },
   "projects": {
-    "api": {
-      "type": "library",
-      "root": "libs/api",
-      "entryFile": "index",
-      "sourceRoot": "libs/api/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/api/tsconfig.lib.json"
-      }
-    },
     "app-config": {
       "type": "library",
       "root": "libs/app-config",

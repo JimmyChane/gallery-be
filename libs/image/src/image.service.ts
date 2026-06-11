@@ -1,12 +1,12 @@
-import { ColorPaletteResDto } from '@app/image/dto/image-palette.res.dto';
-import { FilenameModel } from '@app/image/filename.model';
-import { ImageListService } from '@app/image/image-list.service';
-import { ImageStreamService } from '@app/image/image-stream.service';
 import { LocalFileService } from '@app/local-file/local-file.service';
 import { RedlockService } from '@app/redlock/redlock.service';
 import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { Vibrant } from 'node-vibrant/node';
+import { ImageColorPaletteResDto } from './dto/image-color-palette.res.dto';
 import { ImageItemResDto } from './dto/image-item.res.dto';
+import { FilenameModel } from './model/filename.model';
+import { ImageListService } from './service/image-list.service';
+import { ImageStreamService } from './service/image-stream.service';
 
 @Injectable()
 export class ImageService {
@@ -45,7 +45,7 @@ export class ImageService {
     if (error === 'conflict') throw new ConflictException();
   }
 
-  async getOnePallette(filename: string): Promise<ColorPaletteResDto> {
+  async getOnePallette(filename: string): Promise<ImageColorPaletteResDto> {
     const filenameObj = new FilenameModel(filename);
     const path = this.localFileService.getAbsolutePathOfFilename(filenameObj.toString());
 
