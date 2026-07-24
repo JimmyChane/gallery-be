@@ -3,12 +3,15 @@ import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from
 import { Request } from 'express';
 import { AuthService, JwtAccessPayload } from '../auth.service';
 import { AuthUserStateEnum } from '../enum/auth-user-state.enum';
+import { FEATURE_AUTH_ACCESS_TOKEN } from '@/config/feature-flag';
 
 @Injectable()
 export class AuthAccessTokenGuard implements CanActivate {
   constructor(private readonly authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    if(!FEATURE_AUTH_ACCESS_TOKEN) return true;
+    
     const request = context.switchToHttp().getRequest<Request>();
     const accessToken = this.extractTokenFromHeader(request);
 
