@@ -16,23 +16,23 @@ export class AuthController {
     private userService: UserService,
   ) {}
 
-  @Post('login')
+  @Post('/login')
   async login(@Body() body: AuthLoginReqDto): Promise<AuthLoginResDto> {
     return this.authService.login(body);
   }
 
-  @Post('exchange')
+  @Post('/exchange')
   async exchange(@Body() body: AuthExchangeReqDto): Promise<AuthAccessResDto> {
     return this.authService.exchangeLoginToken(body);
   }
 
-  @Post('refresh')
+  @Post('/refresh')
   async refresh(@Body() body: AuthRefreshReqDto): Promise<AuthAccessResDto> {
     return this.authService.refreshTokens(body);
   }
 
+  @Get('/self')
   @UseGuards(AuthAccessTokenGuard)
-  @Get('self')
   async self(@GetSelf() self: JwtAccessPayload): Promise<AuthSelfResDto> {
     const userDocument = await this.userService.findOneById(self.userId);
     if (!userDocument) {
