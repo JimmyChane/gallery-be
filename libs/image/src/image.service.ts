@@ -1,6 +1,6 @@
 import { LocalFileService } from '@app/local-file/local-file.service';
 import { RedlockService } from '@app/redlock/redlock.service';
-import { BadRequestException, ConflictException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { Vibrant } from 'node-vibrant/node';
 import { ImageColorPaletteResDto } from './dto/image-color-palette.res.dto';
 import { ImageItemResDto } from './dto/image-item.res.dto';
@@ -28,19 +28,13 @@ export class ImageService {
   }
 
   async streamOne(
-    payload: { filename: string; width?: string | number; height?: string | number },
+    payload: { filename: string; width?: number; height?: number },
     result: { contentType: (contentType: string) => void; write: (chunk: any) => void; end: () => void },
   ): Promise<void> {
     const { filename, width, height } = payload;
 
-    if (filename.includes('/')) {
-      throw new BadRequestException('Invalid filename');
-    }
-
-    const name = decodeURIComponent(filename);
-
-    const error = await this.redlockService.using(name, 1000, async () => {
-      await this.imageStreamService.streamImage({ filename: name, width, height }, result);
+    const error = await this.redlockService.using(filename, 1000, async () => {
+      await this.imageStreamService.streamImage({ filename: filename, width, height }, result);
     });
     if (error === 'conflict') throw new ConflictException();
   }

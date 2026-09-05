@@ -20,6 +20,23 @@ export class ImageController {
     return this.imageService.getList();
   }
 
+  private parseDimension(value: unknown, context: string): number | undefined {
+    if (typeof value === 'string' && value.trim().length < 0) value = undefined;
+
+    if (typeof value === 'string') {
+      value = Number.parseInt(value);
+      if (Number.isNaN(value)) throw new BadRequestException(`Invalid ${context}`);
+    }
+
+    console.log('value', value);
+
+    if (typeof value !== 'number' && value !== undefined) throw new BadRequestException(`Invalid ${context}`);
+
+    if (typeof value === 'number' && value < 0) throw new BadRequestException(`Invalid ${context}`);
+
+    return value;
+  }
+
   @Get('/one/:filename')
   @CacheControl({ maxAge: 604_800, public: true })
   @Expires(604_800)
@@ -29,20 +46,16 @@ export class ImageController {
     @Query('h') height: unknown,
     @Res() response: Response,
   ): Promise<void> {
-    if (typeof filename !== 'string') {
-      throw new BadRequestException('Invalid filename');
-    }
+    if (typeof filename !== 'string') throw new BadRequestException('Invalid filename');
+    if (filename.includes('/')) throw new BadRequestException('Invalid filename');
+    const filenameParsed = decodeURIComponent(filename);
 
-    if (typeof width !== 'string' && typeof width !== 'number' && width !== undefined) {
-      throw new BadRequestException('Invalid width');
-    }
-    if (typeof height !== 'string' && typeof height !== 'number' && height !== undefined) {
-      throw new BadRequestException('Invalid height');
-    }
+    const widthParsed = this.parseDimension(width, 'width');
+    const heightParsed = this.parseDimension(height, 'height');
 
     await benchmark(this.logger, 'streamOne', async () => {
       await this.imageService.streamOne(
-        { filename, width, height },
+        { filename: filenameParsed, width: widthParsed, height: heightParsed },
         {
           contentType: (contentType: string) => response.contentType(contentType),
           write: (chunk: any) => response.write(chunk),

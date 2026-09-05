@@ -18,7 +18,7 @@ export class ImageStreamService {
   ) {}
 
   async streamImage(
-    payload: { filename: string; width?: number | string; height?: number | string },
+    payload: { filename: string; width?: number; height?: number },
     result: { contentType: (contentType: string) => void; write: (chunk: any) => void; end: () => void },
   ): Promise<void> {
     const { filename, width, height } = payload;
