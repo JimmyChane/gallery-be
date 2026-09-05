@@ -65,6 +65,36 @@ export class ImageController {
     });
   }
 
+  @Get('/one/:filename/download')
+  @CacheControl({ maxAge: 604_800, public: true })
+  @Expires(604_800)
+  async downloadOne(
+    @Param('filename') filename: unknown,
+    @Query('w') width: unknown,
+    @Query('h') height: unknown,
+    @Res() response: Response,
+  ): Promise<void> {
+    if (typeof filename !== 'string') throw new BadRequestException('Invalid filename');
+    if (filename.includes('/')) throw new BadRequestException('Invalid filename');
+    const filenameParsed = decodeURIComponent(filename);
+
+    const widthParsed = this.parseDimension(width, 'width');
+    const heightParsed = this.parseDimension(height, 'height');
+
+    response.attachment(filenameParsed);
+
+    await benchmark(this.logger, 'streamOne', async () => {
+      await this.imageService.streamOne(
+        { filename: filenameParsed, width: widthParsed, height: heightParsed },
+        {
+          contentType: (contentType: string) => response.contentType(contentType),
+          write: (chunk: any) => response.write(chunk),
+          end: () => response.end(),
+        },
+      );
+    });
+  }
+
   @Get('/one/:filename/palette')
   async getPallette(@Param('filename') filename: string): Promise<ImageColorPaletteResDto> {
     return benchmark(this.logger, 'getPallette', () => {
