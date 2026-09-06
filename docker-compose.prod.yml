@@ -18,7 +18,7 @@ services:
       ALLOWED_CROSS_ORIGIN: ${ALLOWED_CROSS_ORIGIN}
       ACCESS_TOKEN: ${ACCESS_TOKEN}
     volumes:
-      - /mnt/d/image_storage:/usr/src/app/temp/image_storage
+      - /mnt/d/image_server/res:/usr/src/app/temp/image_server/res
     deploy:
       restart_policy:
         condition: any

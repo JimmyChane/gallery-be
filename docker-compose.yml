@@ -20,7 +20,7 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/dist
-      - /mnt/d/image_storage:/usr/src/app/temp/image_storage
+      - /mnt/d/image_server/res:/usr/src/app/temp/image_server/res
     develop:
       watch:
         - path: ./package.json

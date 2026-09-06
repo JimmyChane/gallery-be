@@ -10,7 +10,7 @@ import { cwd } from 'process';
 export class LocalFileService implements OnModuleInit {
   private readonly logger = new Logger(LocalFileService.name);
 
-  private readonly PUBLIC_DIR = join(cwd(), '/temp/image_storage');
+  private readonly PUBLIC_DIR = join(cwd(), '/temp/image_server/res');
   private readonly INIT_CREATE_FOLDER: boolean = false;
 
   private readonly INVALID_STARTS = ['.', '/', '\\'];
