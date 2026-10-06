@@ -1,12 +1,13 @@
 import { LocalFileService } from '@app/local-file/local-file.service';
 import { RedlockService } from '@app/redlock/redlock.service';
 import { ConflictException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
-import { Vibrant } from 'node-vibrant/node';
 import { ImageColorPaletteResDto } from './dto/image-color-palette.res.dto';
 import { ImageItemResDto } from './dto/image-item.res.dto';
 import { FilenameModel } from './model/filename.model';
 import { ImageListService } from './service/image-list.service';
 import { ImageStreamService } from './service/image-stream.service';
+
+const Vibrant = require('node-vibrant');
 
 @Injectable()
 export class ImageService {

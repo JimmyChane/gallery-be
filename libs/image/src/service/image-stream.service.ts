@@ -1,7 +1,7 @@
 import { benchmark } from '@/util/benchmark';
 import { LocalFileService } from '@app/local-file/local-file.service';
 import { BadRequestException, Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
-import sharp from 'sharp';
+import sharp, { Sharp } from 'sharp';
 import { FilenameModel } from '../model/filename.model';
 import { ImageDimensionModel } from '../model/image-dimension.model';
 import { ImageDimensionService } from './image-dimension.service';
@@ -50,7 +50,7 @@ export class ImageStreamService {
 
     result.contentType(format.mimetype);
 
-    let transformer: sharp.Sharp | undefined = undefined;
+    let transformer: Sharp | undefined = undefined;
 
     // transform size
     transformer = await benchmark(this.logger, 'transfomer', async () => {
