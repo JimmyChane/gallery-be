@@ -42,8 +42,8 @@ export class UserService implements OnModuleInit {
   }
 
   private async createDefaultUser(): Promise<UserDocument | null> {
-    const DEFAULT_USERNAME = this.getValueFromConfig('USER_USERNAME_DEFAULT', USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH);
-    const DEFAULT_PASSWORD = this.getValueFromConfig('USER_PASSWORD_DEFAULT', PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH);
+    const DEFAULT_USERNAME = this.getValueFromConfig('USER_INIT_USERNAME', USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH);
+    const DEFAULT_PASSWORD = this.getValueFromConfig('USER_INIT_PASSWORD', PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH);
 
     const existingUser = await this.findOneByUsername(DEFAULT_USERNAME);
 

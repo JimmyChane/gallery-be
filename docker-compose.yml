@@ -15,8 +15,6 @@ services:
     environment:
       NODE_ENV: dev
       PORT: 8001
-      ALLOWED_CROSS_ORIGIN: ${ALLOWED_CROSS_ORIGIN}
-      ACCESS_TOKEN: ${ACCESS_TOKEN}
     volumes:
       - .:/usr/src/app
       - /usr/src/app/dist

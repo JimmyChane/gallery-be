@@ -15,8 +15,6 @@ services:
     environment:
       NODE_ENV: prod
       PORT: 8001
-      ALLOWED_CROSS_ORIGIN: ${ALLOWED_CROSS_ORIGIN}
-      ACCESS_TOKEN: ${ACCESS_TOKEN}
     volumes:
       - /mnt/d/image_server/res:/usr/src/app/temp/image_server/res
     deploy:
