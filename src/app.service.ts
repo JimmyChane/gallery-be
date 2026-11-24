@@ -13,6 +13,8 @@ export class AppService implements OnModuleInit {
     this.logger.log(`App Version ${wrapWhite(this.VERSION_NAME)}`);
 
     this.logger.log(`APP_ENV_MODE ${wrapWhite(this.envService.APP_ENV_MODE)}`);
-    this.logger.log(`APP_ALLOWED_CROSS_ORIGIN ${wrapWhite(JSON.stringify(this.envService.APP_ALLOWED_CROSS_ORIGIN))}`);
+    this.logger.log(
+      `APP_ALLOWED_CROSS_ORIGIN ${wrapWhite(JSON.stringify(this.envService.APP_ALLOWED_CROSS_ORIGIN))}`,
+    );
   }
 }

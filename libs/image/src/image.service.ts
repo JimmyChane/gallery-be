@@ -1,6 +1,11 @@
 import { LocalFileService } from '@app/local-file/local-file.service';
 import { RedlockService } from '@app/redlock/redlock.service';
-import { ConflictException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { ImageColorPaletteResDto } from './dto/image-color-palette.res.dto';
 import { ImageItemResDto } from './dto/image-item.res.dto';
 import { FilenameModel } from './model/filename.model';
@@ -33,27 +38,48 @@ export class ImageService {
     limit = 10,
   ): Promise<{
     items: { filename: string }[];
-    meta: { total: number; page: number; limit: number; totalPages: number; hasNext: boolean; hasPrev: boolean };
+    meta: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
   }> {
     const result = await this.imagelistService.getListPagable(page, limit);
-    return { items: result.items.map((filename) => ({ filename: encodeURIComponent(filename).toString() })), meta: result.meta };
+    return {
+      items: result.items.map((filename) => ({
+        filename: encodeURIComponent(filename).toString(),
+      })),
+      meta: result.meta,
+    };
   }
 
   async streamOne(
     payload: { filename: string; width?: number; height?: number },
-    result: { contentType: (contentType: string) => void; write: (chunk: any) => void; end: () => void },
+    result: {
+      contentType: (contentType: string) => void;
+      write: (chunk: any) => void;
+      end: () => void;
+    },
   ): Promise<void> {
     const { filename, width, height } = payload;
 
     const error = await this.redlockService.using(filename, 1000, async () => {
-      await this.imageStreamService.streamImage({ filename: filename, width, height }, result);
+      await this.imageStreamService.streamImage(
+        { filename: filename, width, height },
+        result,
+      );
     });
     if (error === 'conflict') throw new ConflictException();
   }
 
   async getOnePallette(filename: string): Promise<ImageColorPaletteResDto> {
     const filenameObj = new FilenameModel(filename);
-    const path = this.localFileService.getAbsolutePathOfFilename(filenameObj.toString());
+    const path = this.localFileService.getAbsolutePathOfFilename(
+      filenameObj.toString(),
+    );
 
     const palette = await Vibrant.from(path)
       .getPalette()

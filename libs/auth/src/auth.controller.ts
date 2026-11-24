@@ -1,5 +1,12 @@
 import { UserService } from '@app/user/user.service';
-import { Body, Controller, Get, NotFoundException, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService, JwtAccessPayload } from './auth.service';
 import { GetSelf } from './decorator/get-self.decorator';
 import { AuthExchangeReqDto } from './dto/auth-exchange.req.dto';
@@ -39,6 +46,9 @@ export class AuthController {
       throw new NotFoundException(`user ${self.userId} not found`);
     }
 
-    return { id: userDocument?._id.toString(), username: userDocument?.username };
+    return {
+      id: userDocument?._id.toString(),
+      username: userDocument?.username,
+    };
   }
 }

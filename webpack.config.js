@@ -11,12 +11,16 @@ module.exports = function (options, webpack) {
       ...options.output, // Preserve existing output options like 'path', 'filename', etc.
       devtoolModuleFilenameTemplate: (info) => {
         // 1. Normalize and fix slashes
-        const normalizedPath = path.normalize(info.absoluteResourcePath).replace(/\\/g, '/');
+        const normalizedPath = path
+          .normalize(info.absoluteResourcePath)
+          .replace(/\\/g, '/');
 
         const projectRoot = path.resolve(__dirname).replace(/\\/g, '/');
 
         // 2. Calculate the path relative to your project root
-        let relativePath = path.relative(projectRoot, normalizedPath).replace(/\\/g, '/');
+        let relativePath = path
+          .relative(projectRoot, normalizedPath)
+          .replace(/\\/g, '/');
 
         // 3. Ensure it starts with a leading slash for that clean look
         if (!relativePath.startsWith('/')) {

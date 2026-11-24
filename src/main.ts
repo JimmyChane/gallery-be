@@ -13,7 +13,11 @@ async function bootstrap(): Promise<void> {
   const appConfigService = app.get(AppConfigService);
 
   app.enableShutdownHooks();
-  app.enableCors({ ...appConfigService.buildCorsOption(), allowedHeaders: 'Content-Type,Authorization', credentials: true });
+  app.enableCors({
+    ...appConfigService.buildCorsOption(),
+    allowedHeaders: 'Content-Type,Authorization',
+    credentials: true,
+  });
   app.useGlobalFilters(new GlobalExceptionFilter());
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
@@ -23,7 +27,11 @@ async function bootstrap(): Promise<void> {
 
   await app.listen(appEnvService.APP_PORT);
 
-  console.log(`Listening on ${wrapCyan(`http://localhost:${appEnvService.APP_PORT}`)}`);
-  console.log(`Swagger on ${wrapCyan(`http://localhost:${appEnvService.APP_PORT}/swagger`)}`);
+  console.log(
+    `Listening on ${wrapCyan(`http://localhost:${appEnvService.APP_PORT}`)}`,
+  );
+  console.log(
+    `Swagger on ${wrapCyan(`http://localhost:${appEnvService.APP_PORT}/swagger`)}`,
+  );
 }
 bootstrap();

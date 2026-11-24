@@ -1,7 +1,11 @@
 import { MaybePromise } from '@chanzor/utils';
 import { Logger } from '@nestjs/common';
 
-export async function benchmark<T>(logger: Logger, name: string, run: () => MaybePromise<T>) {
+export async function benchmark<T>(
+  logger: Logger,
+  name: string,
+  run: () => MaybePromise<T>,
+) {
   const now = performance.now();
 
   try {

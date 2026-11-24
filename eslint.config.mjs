@@ -14,7 +14,10 @@ export default tseslint.config(
       globals: { ...globals.node, ...globals.jest },
       ecmaVersion: 2022,
       sourceType: 'module',
-      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+      parserOptions: {
+        projectService: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
   {

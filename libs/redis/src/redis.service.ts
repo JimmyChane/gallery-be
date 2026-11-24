@@ -1,5 +1,10 @@
 import { waitMs } from '@chanzor/utils';
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import Redis from 'ioredis';
 
 @Injectable()
@@ -33,13 +38,21 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     this.logger.log('Disconnected');
   }
 
-  private async initRedis(...nodes: { host: string; port: number }[]): Promise<Redis[]> {
+  private async initRedis(
+    ...nodes: { host: string; port: number }[]
+  ): Promise<Redis[]> {
     const clientPromises = nodes.map((node) => {
-      const redis = new Redis({ host: node.host, port: node.port, retryStrategy: (times) => Math.min(times * 50, 2000) });
+      const redis = new Redis({
+        host: node.host,
+        port: node.port,
+        retryStrategy: (times) => Math.min(times * 50, 2000),
+      });
 
       return new Promise<Redis>(async (resolve, reject) => {
         redis.once('ready', () => {
-          this.logger.log(`Redis connected and ready on ${node.host}:${node.port}`);
+          this.logger.log(
+            `Redis connected and ready on ${node.host}:${node.port}`,
+          );
           resolve(redis);
         });
 
@@ -49,7 +62,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
         await waitMs(15_000);
         if (redis.status !== 'ready') {
-          reject(new Error(`Redis connection timed out for ${node.host}:${node.port}`));
+          reject(
+            new Error(
+              `Redis connection timed out for ${node.host}:${node.port}`,
+            ),
+          );
         }
       });
     });
@@ -76,7 +93,8 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
     let attempts = 0;
     while (!this.client) {
-      if (attempts > 10) throw new Error('Redis instance was never initialized');
+      if (attempts > 10)
+        throw new Error('Redis instance was never initialized');
       await waitMs(1_000);
       attempts++;
     }

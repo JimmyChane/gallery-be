@@ -15,12 +15,23 @@ export class LocalFileService implements OnModuleInit {
   private readonly INIT_CREATE_FOLDER: boolean = false;
 
   private readonly INVALID_STARTS = ['.', '/', '\\'];
-  private readonly INVALID_CHARS = ['\\', '/', ':', '*', '?', '"', '<', '>', '|'];
+  private readonly INVALID_CHARS = [
+    '\\',
+    '/',
+    ':',
+    '*',
+    '?',
+    '"',
+    '<',
+    '>',
+    '|',
+  ];
 
   async onModuleInit(): Promise<void> {
     const isExist = existsSync(this.PUBLIC_DIR);
     const stat = await lstat(this.PUBLIC_DIR).catch((e: Error) => e);
-    if (stat instanceof Error) throw new Error('Failed to read stat of directory');
+    if (stat instanceof Error)
+      throw new Error('Failed to read stat of directory');
 
     const isDirectory = isExist && stat.isDirectory();
     if (isDirectory) {
@@ -32,8 +43,11 @@ export class LocalFileService implements OnModuleInit {
       throw new Error(`Directory Not Found: ${wrapWhite(this.PUBLIC_DIR)}`);
     }
 
-    const mkdirError = await mkdir(this.PUBLIC_DIR, { recursive: false }).catch((e: Error) => e);
-    if (mkdirError instanceof Error) throw new Error('Failed to create directory');
+    const mkdirError = await mkdir(this.PUBLIC_DIR, { recursive: false }).catch(
+      (e: Error) => e,
+    );
+    if (mkdirError instanceof Error)
+      throw new Error('Failed to create directory');
 
     this.logger.log(`Directory Created: ${wrapWhite(this.PUBLIC_DIR)}`);
   }
@@ -74,7 +88,14 @@ export class LocalFileService implements OnModuleInit {
     limit = 10,
   ): Promise<{
     items: string[];
-    meta: { total: number; page: number; limit: number; totalPages: number; hasNext: boolean; hasPrev: boolean };
+    meta: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
   }> {
     const safePage = Math.max(0, Math.floor(page));
     const safeLimit = Math.max(1, Math.floor(limit));
@@ -88,7 +109,17 @@ export class LocalFileService implements OnModuleInit {
     const hasNext = offset + safeLimit < total;
     const hasPrev = safePage > 0;
 
-    return { items, meta: { total, page: safePage, limit: safeLimit, totalPages, hasNext, hasPrev } };
+    return {
+      items,
+      meta: {
+        total,
+        page: safePage,
+        limit: safeLimit,
+        totalPages,
+        hasNext,
+        hasPrev,
+      },
+    };
   }
 
   async readStreamFilename(filename: string): Promise<ReadStream> {
@@ -120,7 +151,10 @@ export class LocalFileService implements OnModuleInit {
     return join(this.PUBLIC_DIR, filename);
   }
 
-  private filenameStartsWiths(filename: string, ...characters: string[]): string {
+  private filenameStartsWiths(
+    filename: string,
+    ...characters: string[]
+  ): string {
     for (const character of characters) {
       if (filename.startsWith(character)) return character;
     }
@@ -135,14 +169,19 @@ export class LocalFileService implements OnModuleInit {
   }
 
   validateFilename(filename: string): string {
-    const invalidStart = this.filenameStartsWiths(filename, ...this.INVALID_STARTS);
+    const invalidStart = this.filenameStartsWiths(
+      filename,
+      ...this.INVALID_STARTS,
+    );
     if (invalidStart) {
       throw new Error(`invalid filename format, ${filename}, ${invalidStart}`);
     }
 
     const invalidChar = this.filenameIncludes(filename, ...this.INVALID_CHARS);
     if (invalidChar) {
-      throw new Error(`invalid filename character, ${filename}, ${invalidChar}`);
+      throw new Error(
+        `invalid filename character, ${filename}, ${invalidChar}`,
+      );
     }
 
     return filename;

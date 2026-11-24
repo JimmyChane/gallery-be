@@ -1,5 +1,10 @@
 import { getString, MaybeUndefined } from '@chanzor/utils';
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService, JwtAccessPayload } from '../auth.service';
 import { AuthUserStateEnum } from '../enum/auth-user-state.enum';
@@ -12,13 +17,16 @@ export class AuthAccessTokenGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<Request>();
     const accessToken = this.extractTokenFromHeader(request);
 
-    if (!accessToken?.length) throw new UnauthorizedException('Access token missing');
+    if (!accessToken?.length)
+      throw new UnauthorizedException('Access token missing');
 
     try {
-      const payloadJwt: MaybeUndefined<Partial<JwtAccessPayload>> = await this.authService.verifyAccessToken(accessToken);
+      const payloadJwt: MaybeUndefined<Partial<JwtAccessPayload>> =
+        await this.authService.verifyAccessToken(accessToken);
       const userIdJwt = getString(payloadJwt.userId);
 
-      if (!userIdJwt?.length) throw new UnauthorizedException('Invalid token payload');
+      if (!userIdJwt?.length)
+        throw new UnauthorizedException('Invalid token payload');
 
       const state = await this.authService.getUserState(userIdJwt);
       if (state !== AuthUserStateEnum.ACTIVE) {
