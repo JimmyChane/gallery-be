@@ -16,7 +16,7 @@ services:
       NODE_ENV: prod
       PORT: 8001
     volumes:
-      - /mnt/d/image_server/res:/usr/src/app/temp/image_server/res
+      - /mnt/d/gallery-be/res:/usr/src/app/temp/gallery-be/res
     deploy:
       restart_policy:
         condition: any

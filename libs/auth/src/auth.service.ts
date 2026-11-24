@@ -94,6 +94,9 @@ export class AuthService {
     return {
       accessToken: this.jwtService.sign(jwtAccessPayload, { expiresIn: `${this.ACCESS_SESSION_TTL}s` }),
       refreshToken: this.jwtService.sign(jwtRefreshPayload, { expiresIn: `${this.REFRESH_SESSION_TTL}s` }),
+
+      accessTokenTtlSec: this.ACCESS_SESSION_TTL,
+      refreshTokenTtlSec: this.REFRESH_SESSION_TTL,
     };
   }
 

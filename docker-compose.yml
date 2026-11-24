@@ -18,7 +18,7 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/dist
-      - /mnt/d/image_server/res:/usr/src/app/temp/image_server/res
+      - /mnt/d/gallery-be/res:/usr/src/app/temp/gallery-be/res
     develop:
       watch:
         - path: ./package.json
