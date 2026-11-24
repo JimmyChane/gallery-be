@@ -33,4 +33,15 @@ export class ImageListService implements OnModuleInit {
   async getList(): Promise<string[]> {
     return this.localFileService.getList(this.FILE_TYPES);
   }
+
+  // TODO: test
+  async getListPagable(
+    page = 0,
+    limit = 10,
+  ): Promise<{
+    items: string[];
+    meta: { total: number; page: number; limit: number; totalPages: number; hasNext: boolean; hasPrev: boolean };
+  }> {
+    return this.localFileService.getListPagable(this.FILE_TYPES, page, limit);
+  }
 }

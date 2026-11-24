@@ -2,7 +2,8 @@ import { wrapWhite } from '@/util/console.text-wrapper';
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { existsSync, lstatSync, ReadStream, WriteStream } from 'fs';
 import { lstat, mkdir } from 'fs/promises';
-import { createReadStream, createWriteStream, readdirSync, unlink } from 'node:fs';
+import { createReadStream, createWriteStream, unlink } from 'node:fs';
+import { readdir } from 'node:fs/promises';
 import { join } from 'path';
 import { cwd } from 'process';
 
@@ -52,18 +53,42 @@ export class LocalFileService implements OnModuleInit {
   }
 
   async getList(fileTypes: string[]): Promise<string[]> {
-    const filenames = readdirSync(this.PUBLIC_DIR);
-    const supportedFilepaths = filenames.filter((filepath) => {
-      for (const fileType of fileTypes) {
-        if (filepath.endsWith(fileType)) return true;
-      }
+    if (!fileTypes.length) return [];
 
-      return false;
-    });
-    return supportedFilepaths.filter((filepath) => {
-      const filePath = this.getAbsolutePathOfFilename(filepath);
-      return existsSync(filePath) && lstatSync(filePath).isFile();
-    });
+    const entries = await readdir(this.PUBLIC_DIR, { withFileTypes: true });
+
+    return entries
+      .filter((entry) => {
+        if (!entry.isFile()) return false;
+        if (!fileTypes.some((ext) => entry.name.endsWith(ext))) return false;
+        return true;
+      })
+      .map((entry) => entry.name)
+      .sort((a, b) => a.localeCompare(b));
+  }
+
+  // TODO: test
+  async getListPagable(
+    fileTypes: string[],
+    page = 0,
+    limit = 10,
+  ): Promise<{
+    items: string[];
+    meta: { total: number; page: number; limit: number; totalPages: number; hasNext: boolean; hasPrev: boolean };
+  }> {
+    const safePage = Math.max(0, Math.floor(page));
+    const safeLimit = Math.max(1, Math.floor(limit));
+
+    const allFiles = await this.getList(fileTypes);
+
+    const total = allFiles.length;
+    const totalPages = Math.ceil(total / safeLimit);
+    const offset = safePage * safeLimit;
+    const items = allFiles.slice(offset, offset + safeLimit);
+    const hasNext = offset + safeLimit < total;
+    const hasPrev = safePage > 0;
+
+    return { items, meta: { total, page: safePage, limit: safeLimit, totalPages, hasNext, hasPrev } };
   }
 
   async readStreamFilename(filename: string): Promise<ReadStream> {

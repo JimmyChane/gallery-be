@@ -20,12 +20,23 @@ export class ImageService {
     private readonly imageStreamService: ImageStreamService,
   ) {}
 
-  // TODO: GET as pagable
   async getList(): Promise<ImageItemResDto[]> {
     const filenames = await this.imagelistService.getList();
     return filenames.map((filename) => {
       return { filename: encodeURIComponent(filename).toString() };
     });
+  }
+
+  // TODO: test
+  async getListPagable(
+    page = 0,
+    limit = 10,
+  ): Promise<{
+    items: { filename: string }[];
+    meta: { total: number; page: number; limit: number; totalPages: number; hasNext: boolean; hasPrev: boolean };
+  }> {
+    const result = await this.imagelistService.getListPagable(page, limit);
+    return { items: result.items.map((filename) => ({ filename: encodeURIComponent(filename).toString() })), meta: result.meta };
   }
 
   async streamOne(

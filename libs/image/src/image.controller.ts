@@ -9,6 +9,8 @@ import { Response } from 'express';
 import { ImageColorPaletteResDto } from './dto/image-color-palette.res.dto';
 import { ImageItemReqDto } from './dto/image-item.req.dto';
 import { ImageItemResDto } from './dto/image-item.res.dto';
+import { ImageListPagableReqDto } from './dto/image-list-pagable.req.dto';
+import { ImageListPagableResDto } from './dto/image-list-pagable.res.dto';
 
 @Controller()
 @UseGuards(AuthAccessTokenGuard)
@@ -22,6 +24,18 @@ export class ImageController {
   @ApiOkResponse({ description: 'Successfully retrieved list of image filenames.', type: [ImageItemResDto] })
   async getList(): Promise<ImageItemResDto[]> {
     return this.imageService.getList();
+  }
+
+  // TODO: test
+  @Get('/list/pagable')
+  @ApiOperation({
+    summary: 'List images with pagination',
+    description: 'Retrieves a page of image filenames. Page is a 0-based index; default page is 0 and default limit is 10.',
+  })
+  @ApiOkResponse({ description: 'Successfully retrieved a page of image filenames.', type: ImageListPagableResDto })
+  @ApiBadRequestResponse({ description: 'Invalid page or limit parameters provided' })
+  async getListPagable(@Query() query: ImageListPagableReqDto): Promise<ImageListPagableResDto> {
+    return this.imageService.getListPagable(query.page, query.limit);
   }
 
   private parseDimension(value: unknown, context: string): number | undefined {
