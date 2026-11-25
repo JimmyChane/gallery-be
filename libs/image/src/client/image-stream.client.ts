@@ -1,4 +1,3 @@
-import { benchmark } from '@/util/benchmark';
 import { LocalFileClient } from '@app/image/client/local-file.client';
 import {
   BadRequestException,
@@ -7,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import sharp, { Sharp } from 'sharp';
+import { BenchmarkQueue } from '../benchmark-queue';
 import { FilenameModel } from '../model/filename.model';
 import { ImageDimensionModel } from '../model/image-dimension.model';
 import { ImageDimensionClient } from './image-dimension.client';
@@ -14,6 +14,27 @@ import { ImageFormatClient } from './image-format.client';
 
 export class ImageStreamClient {
   private readonly logger = new Logger(ImageStreamClient.name);
+
+  private readonly benchmarks = {
+    isFile: new BenchmarkQueue({ logger: this.logger, label: 'isFile' }),
+    getFormat: new BenchmarkQueue({ logger: this.logger, label: 'getFormat' }),
+    transformer: new BenchmarkQueue({
+      logger: this.logger,
+      label: 'transformer',
+    }),
+    getFileDimensionByFilename: new BenchmarkQueue({
+      logger: this.logger,
+      label: 'getFileDimensionByFilename',
+    }),
+    readStream: new BenchmarkQueue({
+      logger: this.logger,
+      label: 'readStream',
+    }),
+    readStreamFilename: new BenchmarkQueue({
+      logger: this.logger,
+      label: 'readStreamFilename',
+    }),
+  };
 
   private readonly imageDimensionClient: ImageDimensionClient;
 
@@ -43,12 +64,12 @@ export class ImageStreamClient {
     const filenameSrc = await (async () => {
       const filenameSrc = new FilenameModel(filename);
 
-      const isFile = await benchmark(this.logger, 'isFile', () => {
+      const isFile = await this.benchmarks.isFile.run(() => {
         return this.localFileClient.isFile(filenameSrc.toString());
       });
       if (isFile) return filenameSrc;
 
-      const formats = await benchmark(this.logger, 'getFormat', () => {
+      const formats = await this.benchmarks.getFormat.run(() => {
         return this.imageFormatClient.getFormatsByName(filenameReq.name);
       });
       const [format] = formats;
@@ -69,12 +90,10 @@ export class ImageStreamClient {
     let transformer: Sharp | undefined = undefined;
 
     // transform size
-    transformer = await benchmark(this.logger, 'transfomer', async () => {
+    transformer = await this.benchmarks.transformer.run(async () => {
       if (!dimenReq.isSet()) return undefined;
 
-      const dimenImg = await benchmark(
-        this.logger,
-        'getFileDimensionByFilename',
+      const dimenImg = await this.benchmarks.getFileDimensionByFilename.run(
         () => {
           return this.imageDimensionClient.getFileDimensionByFilename(
             filenameSrc.toString(),
@@ -132,16 +151,10 @@ export class ImageStreamClient {
       transformer = newTransformer;
     }
 
-    const readStream = await benchmark(this.logger, 'readStream', async () => {
-      const readStream = await benchmark(
-        this.logger,
-        'readStreamFilename',
-        () => {
-          return this.localFileClient.readStreamFilename(
-            filenameSrc.toString(),
-          );
-        },
-      );
+    const readStream = await this.benchmarks.readStream.run(async () => {
+      const readStream = await this.benchmarks.readStreamFilename.run(() => {
+        return this.localFileClient.readStreamFilename(filenameSrc.toString());
+      });
       if (!transformer) return readStream;
 
       return readStream.pipe(transformer);

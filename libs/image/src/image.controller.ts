@@ -1,6 +1,5 @@
 import { CacheControl } from '@/cache-control/cache-control.decorator';
 import { Expires } from '@/expires/expires.decorator';
-import { benchmark } from '@/util/benchmark';
 import { AuthAccessTokenGuard } from '@app/auth/guard/auth-access-token.guard';
 import { ImageService } from '@app/image/image.service';
 import {
@@ -22,6 +21,7 @@ import {
   ApiProduces,
 } from '@nestjs/swagger';
 import { Response } from 'express';
+import { BenchmarkQueue } from './benchmark-queue';
 import { ImageColorPaletteResDto } from './dto/image-color-palette.res.dto';
 import { ImageItemReqDto } from './dto/image-item.req.dto';
 import { ImageItemResDto } from './dto/image-item.res.dto';
@@ -32,6 +32,19 @@ import { ImageListPagableResDto } from './dto/image-list-pagable.res.dto';
 @UseGuards(AuthAccessTokenGuard)
 export class ImageController {
   private readonly logger = new Logger(ImageController.name);
+
+  private readonly palletteBenchmark = new BenchmarkQueue({
+    logger: this.logger,
+    label: 'getPallette',
+  });
+  private readonly streamBenchmark = new BenchmarkQueue({
+    logger: this.logger,
+    label: 'streamOne',
+  });
+  private readonly downloadBenchmark = new BenchmarkQueue({
+    logger: this.logger,
+    label: 'downloadOne',
+  });
 
   constructor(private readonly imageService: ImageService) {}
 
@@ -48,7 +61,6 @@ export class ImageController {
     return this.imageService.getList();
   }
 
-  // TODO: test
   @Get('/list/pagable')
   @ApiOperation({
     summary: 'List images with pagination',
@@ -122,8 +134,8 @@ export class ImageController {
     const widthParsed = this.parseDimension(query.w, 'width');
     const heightParsed = this.parseDimension(query.h, 'height');
 
-    await benchmark(this.logger, 'streamOne', async () => {
-      await this.imageService.streamOne(
+    await this.streamBenchmark.run(() =>
+      this.imageService.streamOne(
         { filename: filenameParsed, width: widthParsed, height: heightParsed },
         {
           contentType: (contentType: string) =>
@@ -131,8 +143,8 @@ export class ImageController {
           write: (chunk: any) => response.write(chunk),
           end: () => response.end(),
         },
-      );
-    });
+      ),
+    );
   }
 
   @Get('/one/:filename/download')
@@ -187,8 +199,8 @@ export class ImageController {
 
     response.attachment(filenameParsed);
 
-    await benchmark(this.logger, 'streamOne', async () => {
-      await this.imageService.streamOne(
+    await this.downloadBenchmark.run(() =>
+      this.imageService.streamOne(
         { filename: filenameParsed, width: widthParsed, height: heightParsed },
         {
           contentType: (contentType: string) =>
@@ -196,8 +208,8 @@ export class ImageController {
           write: (chunk: any) => response.write(chunk),
           end: () => response.end(),
         },
-      );
-    });
+      ),
+    );
   }
 
   @Get('/one/:filename/palette')
@@ -227,8 +239,8 @@ export class ImageController {
 
     const filenameParsed = decodeURIComponent(filename);
 
-    return benchmark(this.logger, 'getPallette', () => {
-      return this.imageService.getOnePallette(filenameParsed);
-    });
+    return this.palletteBenchmark.run(() =>
+      this.imageService.getOnePallette(filenameParsed),
+    );
   }
 }
