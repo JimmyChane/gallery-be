@@ -1,6 +1,26 @@
 import { LocalFileClient } from '@app/image/client/local-file.client';
 import { FilenameModel } from '../model/filename.model';
-import { ImageFormatId, ImageFormatModel } from '../model/image-format.model';
+
+export enum ImageFormatId {
+  WEBP = 'webp',
+  PNG = 'png',
+  JPG = 'jpg',
+  JPEG = 'jpeg',
+}
+
+export class ImageFormatModel {
+  constructor(
+    readonly mimetype: string,
+    readonly ext: ImageFormatId,
+  ) {}
+
+  isSameMimetype(mimetype: string): boolean {
+    return this.mimetype === mimetype;
+  }
+  isSameExt(ext: string): boolean {
+    return this.ext === ext;
+  }
+}
 
 export class ImageFormatClient {
   readonly WEBP = new ImageFormatModel('image/webp', ImageFormatId.WEBP);
