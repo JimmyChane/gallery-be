@@ -1,10 +1,8 @@
-import { LocalFileService } from '@app/local-file/local-file.service';
-import { Injectable } from '@nestjs/common';
+import { LocalFileClient } from '@app/image/client/local-file.client';
 import { FilenameModel } from '../model/filename.model';
 import { ImageFormatId, ImageFormatModel } from '../model/image-format.model';
 
-@Injectable()
-export class ImageFormatService {
+export class ImageFormatClient {
   readonly WEBP = new ImageFormatModel('image/webp', ImageFormatId.WEBP);
   readonly PNG = new ImageFormatModel('image/png', ImageFormatId.PNG);
   readonly JPG = new ImageFormatModel('image/jpg', ImageFormatId.JPG);
@@ -19,7 +17,7 @@ export class ImageFormatService {
 
   private readonly LIST = Object.values(this.MAPS);
 
-  constructor(private readonly localFileService: LocalFileService) {}
+  constructor(private readonly localFileClient: LocalFileClient) {}
 
   getList(): ImageFormatModel[] {
     return this.LIST;
@@ -29,7 +27,7 @@ export class ImageFormatService {
     const formats: ImageFormatModel[] = [];
     for (const format of this.LIST) {
       const filename = new FilenameModel(name, format.ext);
-      const isFile = this.localFileService.isFile(filename.toString());
+      const isFile = this.localFileClient.isFile(filename.toString());
       if (isFile) formats.push(format);
     }
     return formats;

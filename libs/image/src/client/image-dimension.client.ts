@@ -1,22 +1,20 @@
-import { LocalFileService } from '@app/local-file/local-file.service';
-import { Injectable } from '@nestjs/common';
+import { LocalFileClient } from '@app/image/client/local-file.client';
 import sharp from 'sharp';
 import { FilenameModel } from '../model/filename.model';
-import { ImageFormatService } from './image-format.service';
+import { ImageFormatClient } from './image-format.client';
 
-@Injectable()
-export class ImageDimensionService {
+export class ImageDimensionClient {
   constructor(
-    private readonly localFileService: LocalFileService,
-    private readonly imageFormatService: ImageFormatService,
+    private readonly localFileClient: LocalFileClient,
+    private readonly imageFormatClient: ImageFormatClient,
   ) {}
 
   async getFileDimensionByFilename(
     filename: string,
   ): Promise<{ width?: number; height?: number } | undefined> {
     const filenameObj = new FilenameModel(filename);
-    if (filenameObj.ext !== this.imageFormatService.WEBP.ext) {
-      const absolutePath = this.localFileService.getAbsolutePathOfFilename(
+    if (filenameObj.ext !== this.imageFormatClient.WEBP.ext) {
+      const absolutePath = this.localFileClient.getAbsolutePathOfFilename(
         filenameObj.toString(),
       );
       const imageStream = sharp(absolutePath);
@@ -26,7 +24,7 @@ export class ImageDimensionService {
       return dimen;
     }
 
-    const fileReadStream = await this.localFileService.readStreamFilename(
+    const fileReadStream = await this.localFileClient.readStreamFilename(
       filenameObj.toString(),
     );
     return new Promise((resolve, reject) => {

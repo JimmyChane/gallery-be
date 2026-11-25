@@ -73,15 +73,6 @@
         "tsConfigPath": "libs/image/tsconfig.lib.json"
       }
     },
-    "local-file": {
-      "type": "library",
-      "root": "libs/local-file",
-      "entryFile": "index",
-      "sourceRoot": "libs/local-file/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/local-file/tsconfig.lib.json"
-      }
-    },
     "redis": {
       "type": "library",
       "root": "libs/redis",

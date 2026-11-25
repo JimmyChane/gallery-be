@@ -106,7 +106,6 @@
       "^@app/database-mongodb(|/.*)$": "<rootDir>/libs/database-mongodb/src/$1",
       "^@app/health(|/.*)$": "<rootDir>/libs/health/src/$1",
       "^@app/image(|/.*)$": "<rootDir>/libs/image/src/$1",
-      "^@app/local-file(|/.*)$": "<rootDir>/libs/local-file/src/$1",
       "^@app/redis(|/.*)$": "<rootDir>/libs/redis/src/$1",
       "^@app/redlock(|/.*)$": "<rootDir>/libs/redlock/src/$1",
       "^@app/user(|/.*)$": "<rootDir>/libs/user/src/$1"

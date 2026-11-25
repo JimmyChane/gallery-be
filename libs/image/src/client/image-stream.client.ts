@@ -1,8 +1,7 @@
 import { benchmark } from '@/util/benchmark';
-import { LocalFileService } from '@app/local-file/local-file.service';
+import { LocalFileClient } from '@app/image/client/local-file.client';
 import {
   BadRequestException,
-  Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
@@ -10,18 +9,23 @@ import {
 import sharp, { Sharp } from 'sharp';
 import { FilenameModel } from '../model/filename.model';
 import { ImageDimensionModel } from '../model/image-dimension.model';
-import { ImageDimensionService } from './image-dimension.service';
-import { ImageFormatService } from './image-format.service';
+import { ImageDimensionClient } from './image-dimension.client';
+import { ImageFormatClient } from './image-format.client';
 
-@Injectable()
-export class ImageStreamService {
-  private readonly logger = new Logger(ImageStreamService.name);
+export class ImageStreamClient {
+  private readonly logger = new Logger(ImageStreamClient.name);
+
+  private readonly imageDimensionClient: ImageDimensionClient;
 
   constructor(
-    private readonly localFileService: LocalFileService,
-    private readonly imageDimensionService: ImageDimensionService,
-    private readonly imageFormatService: ImageFormatService,
-  ) {}
+    private readonly localFileClient: LocalFileClient,
+    private readonly imageFormatClient: ImageFormatClient,
+  ) {
+    this.imageDimensionClient = new ImageDimensionClient(
+      localFileClient,
+      imageFormatClient,
+    );
+  }
 
   async streamImage(
     payload: { filename: string; width?: number; height?: number },
@@ -40,12 +44,12 @@ export class ImageStreamService {
       const filenameSrc = new FilenameModel(filename);
 
       const isFile = await benchmark(this.logger, 'isFile', () => {
-        return this.localFileService.isFile(filenameSrc.toString());
+        return this.localFileClient.isFile(filenameSrc.toString());
       });
       if (isFile) return filenameSrc;
 
       const formats = await benchmark(this.logger, 'getFormat', () => {
-        return this.imageFormatService.getFormatsByName(filenameReq.name);
+        return this.imageFormatClient.getFormatsByName(filenameReq.name);
       });
       const [format] = formats;
       if (format) return new FilenameModel(filenameReq.name, format.ext);
@@ -55,7 +59,7 @@ export class ImageStreamService {
     if (!filenameSrc) throw new NotFoundException('no files found');
 
     // checking supported format
-    const format = this.imageFormatService
+    const format = this.imageFormatClient
       .getList()
       .find((format) => format.ext === filenameReq.ext);
     if (!format) throw new BadRequestException('format not support');
@@ -72,7 +76,7 @@ export class ImageStreamService {
         this.logger,
         'getFileDimensionByFilename',
         () => {
-          return this.imageDimensionService.getFileDimensionByFilename(
+          return this.imageDimensionClient.getFileDimensionByFilename(
             filenameSrc.toString(),
           );
         },
@@ -113,14 +117,14 @@ export class ImageStreamService {
       })();
 
       switch (filenameReq.ext) {
-        case this.imageFormatService.PNG.ext:
+        case this.imageFormatClient.PNG.ext:
           newTransformer.png();
           break;
-        case this.imageFormatService.JPG.ext:
-        case this.imageFormatService.JPEG.ext:
+        case this.imageFormatClient.JPG.ext:
+        case this.imageFormatClient.JPEG.ext:
           newTransformer.jpeg();
           break;
-        case this.imageFormatService.WEBP.ext:
+        case this.imageFormatClient.WEBP.ext:
           newTransformer.webp();
           break;
       }
@@ -133,7 +137,7 @@ export class ImageStreamService {
         this.logger,
         'readStreamFilename',
         () => {
-          return this.localFileService.readStreamFilename(
+          return this.localFileClient.readStreamFilename(
             filenameSrc.toString(),
           );
         },

@@ -1,21 +1,20 @@
 import { wrapWhite } from '@/util/console.text-wrapper';
-import { LocalFileService } from '@app/local-file/local-file.service';
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
-import { ImageFormatService } from './image-format.service';
+import { LocalFileClient } from '@app/image/client/local-file.client';
+import { Logger } from '@nestjs/common';
+import { ImageFormatClient } from './image-format.client';
 
-@Injectable()
-export class ImageListService implements OnModuleInit {
-  private readonly logger = new Logger(ImageListService.name);
+export class ImageListClient {
+  private readonly logger = new Logger(ImageListClient.name);
 
   private FILE_TYPES!: string[];
 
   constructor(
-    private readonly localFileService: LocalFileService,
-    private readonly imageFormatService: ImageFormatService,
+    private readonly localFileClient: LocalFileClient,
+    private readonly imageFormatClient: ImageFormatClient,
   ) {}
 
-  onModuleInit(): void {
-    const fileTypes = this.imageFormatService
+  async start(): Promise<void> {
+    const fileTypes = this.imageFormatClient
       .getList()
       .reduce((formats: string[], image) => {
         formats.push(image.ext.toLowerCase());
@@ -36,7 +35,7 @@ export class ImageListService implements OnModuleInit {
   }
 
   async getList(): Promise<string[]> {
-    return this.localFileService.getList(this.FILE_TYPES);
+    return this.localFileClient.getList(this.FILE_TYPES);
   }
 
   // TODO: test
@@ -54,6 +53,6 @@ export class ImageListService implements OnModuleInit {
       hasPrev: boolean;
     };
   }> {
-    return this.localFileService.getListPagable(this.FILE_TYPES, page, limit);
+    return this.localFileClient.getListPagable(this.FILE_TYPES, page, limit);
   }
 }

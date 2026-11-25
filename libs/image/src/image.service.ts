@@ -1,32 +1,54 @@
-import { LocalFileService } from '@app/local-file/local-file.service';
+import { LocalFileClient } from '@app/image/client/local-file.client';
 import { RedlockService } from '@app/redlock/redlock.service';
 import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
   Logger,
+  OnModuleInit,
 } from '@nestjs/common';
+import { join } from 'path';
+import { cwd } from 'process';
+import { ImageFormatClient } from './client/image-format.client';
+import { ImageListClient } from './client/image-list.client';
+import { ImageStreamClient } from './client/image-stream.client';
 import { ImageColorPaletteResDto } from './dto/image-color-palette.res.dto';
 import { ImageItemResDto } from './dto/image-item.res.dto';
 import { FilenameModel } from './model/filename.model';
-import { ImageListService } from './service/image-list.service';
-import { ImageStreamService } from './service/image-stream.service';
 
 const Vibrant = require('node-vibrant');
 
 @Injectable()
-export class ImageService {
+export class ImageService implements OnModuleInit {
   private readonly logger = new Logger(ImageService.name);
 
-  constructor(
-    private readonly redlockService: RedlockService,
-    private readonly localFileService: LocalFileService,
-    private readonly imagelistService: ImageListService,
-    private readonly imageStreamService: ImageStreamService,
-  ) {}
+  private readonly localFileClient: LocalFileClient;
+  private readonly imageFormatClient: ImageFormatClient;
+  private readonly imageListClient: ImageListClient;
+  private readonly imageStreamClient: ImageStreamClient;
+
+  constructor(private readonly redlockService: RedlockService) {
+    this.localFileClient = new LocalFileClient({
+      dir: join(cwd(), '/temp/gallery-be/res'),
+    });
+    this.imageFormatClient = new ImageFormatClient(this.localFileClient);
+    this.imageListClient = new ImageListClient(
+      this.localFileClient,
+      this.imageFormatClient,
+    );
+    this.imageStreamClient = new ImageStreamClient(
+      this.localFileClient,
+      this.imageFormatClient,
+    );
+  }
+
+  async onModuleInit() {
+    await this.localFileClient.start();
+    await this.imageListClient.start();
+  }
 
   async getList(): Promise<ImageItemResDto[]> {
-    const filenames = await this.imagelistService.getList();
+    const filenames = await this.imageListClient.getList();
     return filenames.map((filename) => {
       return { filename: encodeURIComponent(filename).toString() };
     });
@@ -47,7 +69,7 @@ export class ImageService {
       hasPrev: boolean;
     };
   }> {
-    const result = await this.imagelistService.getListPagable(page, limit);
+    const result = await this.imageListClient.getListPagable(page, limit);
     return {
       items: result.items.map((filename) => ({
         filename: encodeURIComponent(filename).toString(),
@@ -67,7 +89,7 @@ export class ImageService {
     const { filename, width, height } = payload;
 
     const error = await this.redlockService.using(filename, 1000, async () => {
-      await this.imageStreamService.streamImage(
+      await this.imageStreamClient.streamImage(
         { filename: filename, width, height },
         result,
       );
@@ -77,7 +99,7 @@ export class ImageService {
 
   async getOnePallette(filename: string): Promise<ImageColorPaletteResDto> {
     const filenameObj = new FilenameModel(filename);
-    const path = this.localFileService.getAbsolutePathOfFilename(
+    const path = this.localFileClient.getAbsolutePathOfFilename(
       filenameObj.toString(),
     );
 
